@@ -64,7 +64,7 @@ const App = () => {
       : `https://c37ebab283094df7.mokky.dev/api/${id}`;
     try {
       await axios.delete(url);
-      message.success("To-do muvaffaqiyatli o'chirildi");
+      message.success(" Savollar  muvaffaqiyatli o'chirildi");
       fetchTodos();
       fetchDoneTodos();
     } catch (error) {
@@ -96,7 +96,7 @@ const App = () => {
       className="p-6  mx-auto text-white rounded-lg shadow-lg min-h-screen"
     >
       <h1 className="text-4xl font-bold mb-8 text-center text-violet-500">
-        Questions
+        Interview questions
       </h1>
 
       <Button
