@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Input, Button, Modal, message } from "antd";
 import { CheckCircleOutlined, DeleteOutlined } from "@ant-design/icons";
+import "./App.css";
+
+const { TextArea } = Input;
 
 const App = () => {
   const [todos, setTodos] = useState([]);
@@ -38,17 +41,24 @@ const App = () => {
 
   const handleAddTodo = async () => {
     try {
-      await axios.post("https://c37ebab283094df7.mokky.dev/api", todoData);
-      message.success("Yangi To-do muvaffaqiyatli qo'shildi");
-      setIsModalOpen(false);
-      setTodoData({ question: "", answer: "" });
-      fetchTodos();
+      if (todoData.question && todoData.answer) {
+        await axios.post("https://c37ebab283094df7.mokky.dev/api", todoData);
+        message.success("Yangi To-do muvaffaqiyatli qo'shildi");
+        setIsModalOpen(false);
+        setTodoData({ question: "", answer: "" });
+        fetchTodos();
+      } else {
+        message.warning("Iltimos, savol va javobni kiriting");
+      }
     } catch (error) {
       message.error("Saqlashda xatolik yuz berdi");
     }
   };
 
   const handleDelete = async (id, isDone) => {
+    const confirmDelete = window.confirm("O'chirmoqchimisiz?");
+    if (!confirmDelete) return;
+
     const url = isDone
       ? `https://c37ebab283094df7.mokky.dev/done/${id}`
       : `https://c37ebab283094df7.mokky.dev/api/${id}`;
@@ -79,64 +89,79 @@ const App = () => {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto bg-gray-900 text-white rounded-lg shadow-lg min-h-screen">
+    <div
+      style={{
+        maxWidth: "1300px",
+      }}
+      className="p-6  mx-auto text-white rounded-lg shadow-lg min-h-screen"
+    >
       <h1 className="text-4xl font-bold mb-8 text-center text-violet-500">
-        To-do Dasturi
+        Questions
       </h1>
 
       <Button
         type="primary"
         onClick={() => setIsModalOpen(true)}
-        className="mb-8 w-full bg-violet-600 hover:bg-violet-700 border-none rounded-lg text-lg"
+        className="mb-8 py-6 w-full bg-violet-600 hover:bg-violet-700 border-none rounded-lg text-lg"
       >
-        Yangi To-do qo'shish
+        Add question
       </Button>
 
-      <div>
-        <h2 className="font-semibold text-2xl mb-6 text-violet-400">
-          Vazifalar
-        </h2>
-        <div className="space-y-4">
-          {todos.map((todo) => (
-            <div
-              key={todo.id}
-              className="flex justify-between items-center p-5 rounded-lg shadow-md bg-gray-800 hover:bg-gray-700 transition duration-300"
-            >
-              <span className="text-lg text-gray-300 flex-1">
-                {todo.question}
-              </span>
-              <div className="flex items-center space-x-3">
-                <CheckCircleOutlined
-                  className="text-violet-500 cursor-pointer text-xl"
-                  onClick={() => handleToggleCompleted(todo)}
-                />
-                <DeleteOutlined
-                  onClick={() => handleDelete(todo.id, false)}
-                  className="text-red-500 cursor-pointer text-xl"
-                />
+      <div className="flex flex-col md:flex-row gap-8">
+        <div className="flex-1">
+          <h2 className="font-semibold text-2xl mb-6 text-violet-400">
+            Questions
+          </h2>
+          <div className="space-y-4 cursor-pointer">
+            {todos.map((todo) => (
+              <div
+                key={todo.id}
+                className="flex flex-col justify-between p-5 rounded-lg shadow-md bg-gray-800 hover:bg-gray-700 transition duration-300"
+              >
+                <div className=" flex items-start">
+                  <div className="text-lg text-gray-300 flex-1">
+                    <strong>{todo.question}</strong>
+                    <p>{todo.answer}</p>
+                  </div>
+                  <div className="flex items-center space-x-3 mt-4">
+                    <CheckCircleOutlined
+                      className="text-violet-500 cursor-pointer text-xl"
+                      onClick={() => handleToggleCompleted(todo)}
+                    />
+                    <DeleteOutlined
+                      onClick={() => handleDelete(todo.id, false)}
+                      className="text-red-500 cursor-pointer text-xl"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
-        <h2 className="font-semibold text-2xl mt-10 text-violet-400">
-          Bajarilganlar
-        </h2>
-        <div className="space-y-4 mt-4">
-          {doneTodos.map((todo) => (
-            <div
-              key={todo.id}
-              className="flex justify-between items-center p-5 rounded-lg shadow-md bg-gray-700 hover:bg-gray-600 transition duration-300"
-            >
-              <span className="text-lg text-gray-400 flex-1">
-                {todo.question}
-              </span>
-              <DeleteOutlined
-                onClick={() => handleDelete(todo.id, true)}
-                className="text-red-500 cursor-pointer text-xl"
-              />
-            </div>
-          ))}
+        <div className="flex-1">
+          <h2 className="font-semibold text-2xl mb-6 text-violet-400">
+            Learned ones
+          </h2>
+          <div className="space-y-4 cursor-pointer">
+            {doneTodos.map((todo) => (
+              <div
+                key={todo.id}
+                className="flex flex-col justify-between p-5 rounded-lg shadow-md bg-gray-700 hover:bg-gray-600 transition duration-300"
+              >
+                <div className=" flex items-start">
+                  <div className="text-lg text-gray-400 flex-1">
+                    <strong>{todo.question}</strong>
+                    <p>{todo.answer}</p>
+                  </div>
+                  <DeleteOutlined
+                    onClick={() => handleDelete(todo.id, true)}
+                    className="text-red-500 cursor-pointer text-xl mt-4"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -154,11 +179,13 @@ const App = () => {
             setTodoData({ ...todoData, question: e.target.value })
           }
           className="mb-4"
+          style={{ color: "black" }}
         />
-        <Input
+        <TextArea
           placeholder="Javob"
           value={todoData.answer}
           onChange={(e) => setTodoData({ ...todoData, answer: e.target.value })}
+          style={{ color: "black" }}
         />
       </Modal>
     </div>

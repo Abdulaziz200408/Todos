@@ -1,0 +1,23 @@
+.custom-modal .ant-modal-content {
+  background-color: #2d2d2d;
+  color: #e5e5e5;
+  border-radius: 8px;
+}
+
+.custom-modal .ant-modal-header {
+  background-color: #2d2d2d;
+  border-bottom: 1px solid #444;
+}
+
+.custom-modal .ant-modal-title {
+  color: #e5e5e5;
+}
+
+.custom-modal .ant-modal-footer {
+  background-color: #2d2d2d;
+  border-top: none;
+}
+
+.ant-modal-mask {
+  background: rgba(0, 0, 0, 0.326); /* Dark semi-transparent backdrop */
+}
