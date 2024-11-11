@@ -5,8 +5,16 @@
 body {
   background-image: url("https://4kwallpapers.com/images/wallpapers/dark-background-abstract-background-network-3d-background-2560x1440-8324.png");
   width: 100%;
-  background-size: 100% 100%;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   min-height: 100vh;
+}
+
+/* Telefon ekranlari uchun */
+@media (max-width: 768px) {
+  body {
+    background-size: auto 100%; /* Telefon uchun tasvir balandlikka moslanadi */
+    background-position: center;
+  }
 }
