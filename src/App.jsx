@@ -138,7 +138,7 @@ const App = () => {
                       style={{
                         marginTop: "4px",
                         marginBottom: "4px",
-                        borderColor: "red",
+                        borderColor: "aqua",
                       }}
                     />
                     <p>{formatTextWithColor(todo.answer)}</p>
