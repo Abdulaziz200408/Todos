@@ -21,3 +21,11 @@
 .ant-modal-mask {
   background: rgba(0, 0, 0, 0.326); /* Dark semi-transparent backdrop */
 }
+
+hr {
+  color: red !important;
+}
+
+.colod {
+  color: aqua;
+}

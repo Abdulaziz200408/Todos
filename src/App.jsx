@@ -64,7 +64,7 @@ const App = () => {
       : `https://c37ebab283094df7.mokky.dev/api/${id}`;
     try {
       await axios.delete(url);
-      message.success(" Savollar  muvaffaqiyatli o'chirildi");
+      message.success("Savollar muvaffaqiyatli o'chirildi");
       fetchTodos();
       fetchDoneTodos();
     } catch (error) {
@@ -88,12 +88,25 @@ const App = () => {
     }
   };
 
+  const formatTextWithColor = (text) => {
+    const regex = /\*(.*?)\*/g;
+    return text.split(regex).map((part, index) =>
+      index % 2 === 1 ? (
+        <span className="colod" key={index}>
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
+  };
+
   return (
     <div
       style={{
         maxWidth: "1300px",
       }}
-      className="p-6  mx-auto text-white rounded-lg shadow-lg min-h-screen"
+      className="p-6 mx-auto text-white rounded-lg shadow-lg min-h-screen"
     >
       <h1 className="text-4xl font-bold mb-8 text-center text-violet-500">
         Interview questions
@@ -118,20 +131,33 @@ const App = () => {
                 key={todo.id}
                 className="flex flex-col justify-between p-5 rounded-lg shadow-md bg-gray-800 hover:bg-gray-700 transition duration-300"
               >
-                <div className=" flex items-start">
+                <div className="flex items-start">
                   <div className="text-lg text-gray-300 flex-1">
-                    <strong>{todo.question}</strong>
-                    <p>{todo.answer}</p>
+                    <h1>{todo.question}</h1>
+                    <hr
+                      style={{
+                        marginTop: "4px",
+                        marginBottom: "4px",
+                        borderColor: "red",
+                      }}
+                    />
+                    <p>{formatTextWithColor(todo.answer)}</p>
                   </div>
-                  <div className="flex items-center space-x-3 mt-4">
-                    <CheckCircleOutlined
-                      className="text-violet-500 cursor-pointer text-xl"
+                  <div className="flex flex-col items-center gap-2">
+                    <button
+                      aria-label="Mark as completed"
                       onClick={() => handleToggleCompleted(todo)}
-                    />
-                    <DeleteOutlined
+                      className="text-violet-500 text-xl"
+                    >
+                      <CheckCircleOutlined />
+                    </button>
+                    <button
+                      aria-label="Delete question"
                       onClick={() => handleDelete(todo.id, false)}
-                      className="text-red-500 cursor-pointer text-xl"
-                    />
+                      className="text-red-500 text-xl"
+                    >
+                      <DeleteOutlined />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -149,15 +175,18 @@ const App = () => {
                 key={todo.id}
                 className="flex flex-col justify-between p-5 rounded-lg shadow-md bg-gray-700 hover:bg-gray-600 transition duration-300"
               >
-                <div className=" flex items-start">
+                <div className="flex items-start">
                   <div className="text-lg text-gray-400 flex-1">
-                    <strong>{todo.question}</strong>
-                    <p>{todo.answer}</p>
+                    <strong>{formatTextWithColor(todo.question)}</strong>
+                    <p>{formatTextWithColor(todo.answer)}</p>
                   </div>
-                  <DeleteOutlined
+                  <button
+                    aria-label="Delete learned question"
                     onClick={() => handleDelete(todo.id, true)}
-                    className="text-red-500 cursor-pointer text-xl mt-4"
-                  />
+                    className="text-red-500 text-xl mt-4"
+                  >
+                    <DeleteOutlined />
+                  </button>
                 </div>
               </div>
             ))}
@@ -187,6 +216,10 @@ const App = () => {
           onChange={(e) => setTodoData({ ...todoData, answer: e.target.value })}
           style={{ color: "black" }}
         />
+        <div className="mt-4">
+          <strong>Preview:</strong>
+          <p>{formatTextWithColor(todoData.answer)}</p>
+        </div>
       </Modal>
     </div>
   );
