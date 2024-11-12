@@ -7,10 +7,16 @@ import "./App.css";
 const { TextArea } = Input;
 
 const App = () => {
-  const [todos, setTodos] = useState([]);
-  const [doneTodos, setDoneTodos] = useState([]);
+  const [todos, setTodos] = useState([]); // You can replace `any` with a custom type if necessary
+  const [doneTodos, setDoneTodos] = useState([]); // Same here
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [todoData, setTodoData] = useState({ question: "", answer: "" });
+  const [todoData, setTodoData] = useState({
+    question: "",
+    answer: "",
+    questionNumber: "",
+  });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchDoneTerm, setSearchDoneTerm] = useState("");
 
   useEffect(() => {
     fetchTodos();
@@ -41,14 +47,14 @@ const App = () => {
 
   const handleAddTodo = async () => {
     try {
-      if (todoData.question && todoData.answer) {
+      if (todoData.question && todoData.answer && todoData.questionNumber) {
         await axios.post("https://c37ebab283094df7.mokky.dev/api", todoData);
         message.success("Yangi To-do muvaffaqiyatli qo'shildi");
         setIsModalOpen(false);
-        setTodoData({ question: "", answer: "" });
+        setTodoData({ question: "", answer: "", questionNumber: "" });
         fetchTodos();
       } else {
-        message.warning("Iltimos, savol va javobni kiriting");
+        message.warning("Iltimos, savol, javob va savol raqamini kiriting");
       }
     } catch (error) {
       message.error("Saqlashda xatolik yuz berdi");
@@ -101,6 +107,15 @@ const App = () => {
     );
   };
 
+  // Filtered todos based on search term
+  const filteredTodos = todos.filter((todo) =>
+    todo.question.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredDoneTodos = doneTodos.filter((todo) =>
+    todo.question.toLowerCase().includes(searchDoneTerm.toLowerCase())
+  );
+
   return (
     <div
       style={{
@@ -125,15 +140,23 @@ const App = () => {
           <h2 className="font-semibold text-2xl mb-6 text-violet-400">
             Questions
           </h2>
+          <Input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="mb-4"
+            style={{ backgroundColor: "#2d2d2d", color: "white" }}
+          />
           <div className="space-y-4 cursor-pointer">
-            {todos.map((todo) => (
+            {filteredTodos.map((todo) => (
               <div
                 key={todo.id}
                 className="flex flex-col justify-between p-5 rounded-lg shadow-md bg-gray-800 hover:bg-gray-700 transition duration-300"
               >
                 <div className="flex items-start">
                   <div className="text-lg text-gray-300 flex-1">
-                    <h1>{todo.question}</h1>
+                    <h1>
+                      #{todo.questionNumber} {todo.question}
+                    </h1>
                     <hr
                       style={{
                         marginTop: "4px",
@@ -142,6 +165,7 @@ const App = () => {
                       }}
                     />
                     <p>{formatTextWithColor(todo.answer)}</p>
+                    <p className="text-gray-500">ID: {todo.id}</p>
                   </div>
                   <div className="flex flex-col items-center gap-2">
                     <button
@@ -167,18 +191,34 @@ const App = () => {
 
         <div className="flex-1">
           <h2 className="font-semibold text-2xl mb-6 text-violet-400">
-            Learned ones
+            Learned Ones
           </h2>
+          <Input
+            value={searchDoneTerm}
+            onChange={(e) => setSearchDoneTerm(e.target.value)}
+            className="mb-4"
+            style={{ backgroundColor: "#2d2d2d", color: "white" }}
+          />
           <div className="space-y-4 cursor-pointer">
-            {doneTodos.map((todo) => (
+            {filteredDoneTodos.map((todo) => (
               <div
                 key={todo.id}
                 className="flex flex-col justify-between p-5 rounded-lg shadow-md bg-gray-700 hover:bg-gray-600 transition duration-300"
               >
                 <div className="flex items-start">
                   <div className="text-lg text-gray-400 flex-1">
-                    <strong>{formatTextWithColor(todo.question)}</strong>
+                    <h1>
+                      #{todo.questionNumber} {todo.question}
+                    </h1>
+                    <hr
+                      style={{
+                        marginTop: "4px",
+                        marginBottom: "4px",
+                        borderColor: "aqua",
+                      }}
+                    />
                     <p>{formatTextWithColor(todo.answer)}</p>
+                    <p className="text-gray-500">ID: {todo.id}</p>
                   </div>
                   <button
                     aria-label="Delete learned question"
@@ -195,30 +235,37 @@ const App = () => {
       </div>
 
       <Modal
-        title="Yangi To-do qo'shish"
+        title="Yangi Savol Qo'shish"
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
         onOk={handleAddTodo}
-        className="custom-modal"
+        onCancel={() => setIsModalOpen(false)}
+        okText="Qo'shish"
+        cancelText="Bekor qilish"
       >
-        <Input
-          placeholder="Savol"
-          value={todoData.question}
-          onChange={(e) =>
-            setTodoData({ ...todoData, question: e.target.value })
-          }
-          className="mb-4"
-          style={{ color: "black" }}
-        />
-        <TextArea
-          placeholder="Javob"
-          value={todoData.answer}
-          onChange={(e) => setTodoData({ ...todoData, answer: e.target.value })}
-          style={{ color: "black" }}
-        />
-        <div className="mt-4">
-          <strong>Preview:</strong>
-          <p>{formatTextWithColor(todoData.answer)}</p>
+        <div className="space-y-4">
+          <Input
+            value={todoData.question}
+            onChange={(e) =>
+              setTodoData({ ...todoData, question: e.target.value })
+            }
+            placeholder="Savol"
+          />
+          <TextArea
+            value={todoData.answer}
+            onChange={(e) =>
+              setTodoData({ ...todoData, answer: e.target.value })
+            }
+            placeholder="Javob"
+            rows={4}
+          />
+          <Input
+            value={todoData.questionNumber}
+            onChange={(e) =>
+              setTodoData({ ...todoData, questionNumber: e.target.value })
+            }
+            placeholder="Savol Raqami"
+            type="number"
+          />
         </div>
       </Modal>
     </div>
